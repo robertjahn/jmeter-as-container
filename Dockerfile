@@ -6,6 +6,9 @@ RUN rm apache-jmeter-4.0.tgz
 
 RUN mv apache-jmeter-4.0 /jmeter
 
+# Copy all our jmeter scripts to the local scripts directory
+COPY /scripts /scripts
+
 ENV JMETER_HOME /jmeter
 
 # Add JMeter to the Path
