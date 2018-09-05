@@ -1,6 +1,6 @@
 # jmeter-as-container
 
-Provides JMeter 3.3 as a Container
+Provides JMeter 4 as a Container
 
 ## Usage
 
