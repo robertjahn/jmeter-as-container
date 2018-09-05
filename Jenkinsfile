@@ -6,7 +6,7 @@ pipeline {
         string(name: 'VUCount',     defaultValue: '1', description: 'Number of Virtual Users to be executed. ', trim: true)
         string(name: 'LoopCount',   defaultValue: '1', description: 'Number of iterations every virtual user executes', trim: true)
         string(name: 'DT_LTN',      defaultValue: 'DTLoadTest', description: 'For scripts that have been setup to pass x-dynatrace-test this will pass the LTN Request Attribute', trim: true)
-        string(name: 'CHECK_PATH',  defaultValue: '/health', description: 'This parameter is only good for scripts that use this parameter, e.g: basiccheck.jmx', trim: true),
+        string(name: 'CHECK_PATH',  defaultValue: '/health', description: 'This parameter is only good for scripts that use this parameter, e.g: basiccheck.jmx', trim: true)
         choice(name: 'BUILD_JMETER' defaultValue: 'no', choices: 'yes\nno', description: 'Do you want to rebuild the JMeter Container. DO IT if scripts have changed!' )
     }
 
