@@ -4,7 +4,7 @@
 # Usage:
 # ./stop_test.sh
 
-sudo docker exec -d jmeter-test ./jmeter/bin/shutdown.sh
+docker exec -d jmeter-test ./jmeter/bin/shutdown.sh
 
 # lets wait u ntil the results are done - then zip em
 waitCycles=10
@@ -16,5 +16,5 @@ do
 done
 
 if [ ! -f /results/index.html ]; then
-  sudo zip -q results.zip results
+  zip -q results.zip results
 fi

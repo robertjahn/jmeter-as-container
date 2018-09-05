@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo docker build -t jmeter .
+docker build -t jmeter .
