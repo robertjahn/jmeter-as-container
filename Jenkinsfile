@@ -1,14 +1,14 @@
 pipeline {
     parameters {
-        string(name: 'SCRIPT_NAME', defaultValue: 'basiccheck.jmx', description: 'The script you want to execute', trim: true)
-        string(name: 'SERVER_URL',  defaultValue: 'user.jx-staging.35.233.18.9.nip.io', description: 'Please enter the URI or the IP of your service you want to run your test against', trim: true)
-        string(name: 'SERVER_PORT', defaultValue: '80', description: 'Please enter the port of the endpoint', trim: true)
-        string(name: 'VUCount',     defaultValue: '1', description: 'Number of Virtual Users to be executed. ', trim: true)
-        string(name: 'LoopCount',   defaultValue: '1', description: 'Number of iterations every virtual user executes', trim: true)
-        string(name: 'DT_LTN',      defaultValue: 'DTLoadTest', description: 'For scripts that have been setup to pass x-dynatrace-test this will pass the LTN Request Attribute', trim: true)
-        string(name: 'CHECK_PATH',  defaultValue: '/health', description: 'This parameter is only good for scripts that use this parameter, e.g: basiccheck.jmx', trim: true),
-        choice(name: 'BUILD_JMETER' defaultValue: 'no', choices: 'yes\nno', description: 'Do you want to rebuild the JMeter Container. DO IT if scripts have changed!' )
-    }
+        choice(name: 'BUILD_JMETER', choices: 'yes\nno', description: 'Do you want to rebuild the JMeter Container. DO IT if scripts have changed!' )
+        string(name: 'SCRIPT_NAME',  defaultValue: 'basiccheck.jmx', description: 'The script you want to execute', trim: true)
+        string(name: 'SERVER_URL',   defaultValue: 'user.jx-staging.35.233.18.9.nip.io', description: 'Please enter the URI or the IP of your service you want to run your test against', trim: true)
+        string(name: 'SERVER_PORT',  defaultValue: '80', description: 'Please enter the port of the endpoint', trim: true)
+        string(name: 'CHECK_PATH',   defaultValue: '/health', description: 'This parameter is only good for scripts that use this parameter, e.g: basiccheck.jmx', trim: true)
+        string(name: 'VUCount',      defaultValue: '1', description: 'Number of Virtual Users to be executed. ', trim: true)
+        string(name: 'LoopCount',    defaultValue: '1', description: 'Number of iterations every virtual user executes', trim: true)
+        string(name: 'DT_LTN',       defaultValue: 'DTLoadTest', description: 'For scripts that have been setup to pass x-dynatrace-test this will pass the LTN Request Attribute', trim: true)
+     }
 
     agent {
         label "jenkins-go"
