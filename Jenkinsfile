@@ -7,6 +7,7 @@ pipeline {
         string(name: 'CHECK_PATH',          defaultValue: '/health', description: 'This parameter is only good for scripts that use this parameter, e.g: basiccheck.jmx', trim: true)
         string(name: 'VUCount',             defaultValue: '1', description: 'Number of Virtual Users to be executed. ', trim: true)
         string(name: 'LoopCount',           defaultValue: '1', description: 'Number of iterations every virtual user executes', trim: true)
+        string(name: 'ThinkTime',           defaultValue: '250', description: 'Default Thinktime between load testing steps')
         string(name: 'DT_LTN',              defaultValue: 'DTLoadTest', description: 'For scripts that have been setup to pass x-dynatrace-test this will pass the LTN Request Attribute', trim: true)
         choice(name: 'FUNC_VALIDATION',     choices: 'yes\nno', description: 'BREAK the Pipeline if there is a functional issue?' )
         string(name: 'AVG_RT_VALIDATION',   defaultValue: '0', description: 'BREAK the Pipeline if the average response time exceeds the passed value. 0 means NO VALIDATION')
@@ -56,7 +57,7 @@ pipeline {
 
                     // lets run the test and put the console output to output.txt
                     sh "echo 'launching container and put result in output.txt'"
-                    sh "docker run -v /home/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm $DOCKER_REGISTRY/$ORG/$APP_NAME ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' > output.txt"
+                    sh "docker run -v /home/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm $DOCKER_REGISTRY/$ORG/$APP_NAME ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$ThinkTime' > output.txt"
 
                     // Lets do the functional validation if FUNC_VALIDATION=='yes'
                     sh '''
