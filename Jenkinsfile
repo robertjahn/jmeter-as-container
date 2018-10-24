@@ -40,7 +40,7 @@ pipeline {
                     checkout scm
                 
                     def app
-                    app = docker.build($DOCKER_REGISTRY/$ORG/$APP_NAME)
+                    app = docker.build("$DOCKER_REGISTRY/$ORG/$APP_NAME")
                     
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                         //sh "docker build -t $DOCKER_REGISTRY/$APP_NAME ."
