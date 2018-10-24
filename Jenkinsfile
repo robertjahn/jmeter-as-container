@@ -32,13 +32,15 @@ pipeline {
             }
             steps
             {
-                // Checkout our application source code
-                // git url: 'https://github.com/dynatrace-sockshop/jmeter-as-container', branch: 'master'
-                sh "git checkout master"
+                script {
+                    // Checkout our application source code
+                    // git url: 'https://github.com/dynatrace-sockshop/jmeter-as-container', branch: 'master'
+                    sh "git checkout master"
                 
-                docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                    sh "docker build -t $DOCKER_REGISTRY/$ORG/$APP_NAME ."
-                    sh "docker push $DOCKER_REGISTRY/$ORG/$APP_NAME"
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                        sh "docker build -t $DOCKER_REGISTRY/$ORG/$APP_NAME ."
+                        sh "docker push $DOCKER_REGISTRY/$ORG/$APP_NAME"
+                    }
                 }
                 
                 //def app
