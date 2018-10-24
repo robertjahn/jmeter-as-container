@@ -2,7 +2,7 @@ pipeline {
     parameters {
         choice(name: 'BUILD_JMETER',        choices: 'yes\nno', description: 'Do you want to rebuild the JMeter Container. DO IT if scripts have changed!' )
         string(name: 'SCRIPT_NAME',         defaultValue: 'basiccheck.jmx', description: 'The script you want to execute', trim: true)
-        string(name: 'SERVER_URL',          defaultValue: 'user.jx-staging.35.233.18.9.nip.io', description: 'Please enter the URI or the IP of your service you want to run your test against', trim: true)
+        string(name: 'SERVER_URL',          defaultValue: '104.196.41.214', description: 'Please enter the URI or the IP of your service you want to run your test against', trim: true)
         string(name: 'SERVER_PORT',         defaultValue: '80', description: 'Please enter the port of the endpoint', trim: true)
         string(name: 'CHECK_PATH',          defaultValue: '/health', description: 'This parameter is only good for scripts that use this parameter, e.g: basiccheck.jmx', trim: true)
         string(name: 'VUCount',             defaultValue: '1', description: 'Number of Virtual Users to be executed. ', trim: true)
@@ -13,9 +13,9 @@ pipeline {
         string(name: 'AVG_RT_VALIDATION',   defaultValue: '0', description: 'BREAK the Pipeline if the average response time exceeds the passed value. 0 means NO VALIDATION')
      }
 
-    agent {
-        label "jenkins-go"
-    }
+    //agent {
+    //    label "jenkins-go"
+    //}
     environment {
         ORG               = 'acm-workshop'
         APP_NAME          = 'jmeter-as-container'
@@ -35,11 +35,18 @@ pipeline {
                 // Checkout our application source code
                 // git url: 'https://github.com/dynatrace-sockshop/jmeter-as-container', branch: 'master'
                 sh "git checkout master"
-
-                container('go') {
-                    sh "docker build -t $DOCKER_REGISTRY/$ORG/$APP_NAME ."
-                    sh "docker push $DOCKER_REGISTRY/$ORG/$APP_NAME"
+                
+                def app
+                app = docker.build("robjahn/jmeter")
+                docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                    app.push("${env.BUILD_NUMBER}")
+                    app.push("latest")
                 }
+
+                //container('go') {
+                //    sh "docker build -t $DOCKER_REGISTRY/$ORG/$APP_NAME ."
+                //    sh "docker push $DOCKER_REGISTRY/$ORG/$APP_NAME"
+                //}
             }
         }
 
@@ -50,14 +57,15 @@ pipeline {
             }
             steps
             {
-                container('go') {
+                //container('go') {
                     // lets create the results directory                    
                     sh "rm -f -r $RESULTDIR"
                     sh "mkdir $RESULTDIR"
 
                     // lets run the test and put the console output to output.txt
                     sh "echo 'launching container and put result in output.txt'"
-                    sh "docker run -v /home/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm $DOCKER_REGISTRY/$ORG/$APP_NAME ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$ThinkTime' > output.txt"
+                    //sh "docker run -v /home/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm $DOCKER_REGISTRY/$ORG/$APP_NAME ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$ThinkTime' > output.txt"
+                    sh "docker run -v /home/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm robjahn/jmeter ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$ThinkTime' > output.txt"
 
                     // Lets do the functional validation if FUNC_VALIDATION=='yes'
                     sh '''
@@ -79,7 +87,7 @@ pipeline {
                             exit 1
                         fi
                     '''
-                }
+                //}
             }
         }
     }
