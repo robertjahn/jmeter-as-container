@@ -36,12 +36,17 @@ pipeline {
                 // git url: 'https://github.com/dynatrace-sockshop/jmeter-as-container', branch: 'master'
                 sh "git checkout master"
                 
-                def app
-                app = docker.build("robjahn/jmeter")
                 docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                    app.push("${env.BUILD_NUMBER}")
-                    app.push("latest")
+                    sh "docker build -t $DOCKER_REGISTRY/$ORG/$APP_NAME ."
+                    sh "docker push $DOCKER_REGISTRY/$ORG/$APP_NAME"
                 }
+                
+                //def app
+                //app = docker.build("robjahn/jmeter")
+                //docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                //    app.push("${env.BUILD_NUMBER}")
+                //    app.push("latest")
+                //}
 
                 //container('go') {
                 //    sh "docker build -t $DOCKER_REGISTRY/$ORG/$APP_NAME ."
@@ -64,8 +69,7 @@ pipeline {
 
                     // lets run the test and put the console output to output.txt
                     sh "echo 'launching container and put result in output.txt'"
-                    //sh "docker run -v /home/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm $DOCKER_REGISTRY/$ORG/$APP_NAME ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$ThinkTime' > output.txt"
-                    sh "docker run -v /home/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm robjahn/jmeter ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$ThinkTime' > output.txt"
+                    sh "docker run -v /home/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm $DOCKER_REGISTRY/$ORG/$APP_NAME ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$ThinkTime' > output.txt"
 
                     // Lets do the functional validation if FUNC_VALIDATION=='yes'
                     sh '''
