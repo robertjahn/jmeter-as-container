@@ -12,7 +12,7 @@ pipeline {
         choice(name: 'FUNC_VALIDATION',     choices: 'yes\nno', description: 'BREAK the Pipeline if there is a functional issue?' )
         string(name: 'AVG_RT_VALIDATION',   defaultValue: '0', description: 'BREAK the Pipeline if the average response time exceeds the passed value. 0 means NO VALIDATION')
      }
-
+    agent any
     //agent {
     //    label "jenkins-go"
     //}
