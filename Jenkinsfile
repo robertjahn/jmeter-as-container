@@ -82,7 +82,7 @@ pipeline {
                     // Lets do the functional validation if FUNC_VALIDATION=='yes'
                     sh '''
                         ERROR_COUNT=$(awk '/summary =/ {print $15;}' output.txt)
-                        if [ "$FUNC_VALIDATION" == "yes" ] && [ $ERROR_COUNT -gt 0 ]
+                        if [ "$FUNC_VALIDATION" = "yes" ] && [ $ERROR_COUNT -gt 0 ]
                         then
                             echo "More than 1 error"
                         exit 1
