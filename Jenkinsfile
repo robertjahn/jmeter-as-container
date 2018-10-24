@@ -17,7 +17,7 @@ pipeline {
     //    label "jenkins-go"
     //}
     environment {
-        DOCKER_REGISTRY   = 'robertjahn'
+        DOCKER_REGISTRY   = 'robjahn'
         ORG               = 'acm-workshop'
         APP_NAME          = 'jmeter-as-container'
         GIT_PROVIDER      = 'github.com'
