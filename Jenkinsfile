@@ -41,7 +41,7 @@ pipeline {
                     }
         }
 
-        stage('TestPrep) {
+        stage('TestPrep') {
             when {
                 // Only run if this is not just for building jmeter
                 expression { params.BUILD_JMETER == 'no' }
