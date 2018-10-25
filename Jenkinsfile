@@ -48,7 +48,7 @@ pipeline {
             }
             steps {
                 // stop and remove Jmeter docker container if still there
-                sh "./cleanup_docker.sh jmeter-test"
+                sh "./cleanup_docker.sh $DOCKER_REGISTRY/$APP_NAME"
                 
                 // lets create the results directory
                 sh "rm -f -r $RESULTDIR"
