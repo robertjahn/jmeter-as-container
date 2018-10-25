@@ -13,9 +13,6 @@ pipeline {
         string(name: 'AVG_RT_VALIDATION',   defaultValue: '0', description: 'BREAK the Pipeline if the average response time exceeds the passed value. 0 means NO VALIDATION')
      }
     agent any
-    //agent {
-    //    label "jenkins-go"
-    //}
     environment {
         DOCKER_REGISTRY   = 'robjahn'
         ORG               = 'acm-workshop'
@@ -34,32 +31,13 @@ pipeline {
             steps
             {
                 script {
-                    // Checkout our application source code
-                    // git url: 'https://github.com/dynatrace-sockshop/jmeter-as-container', branch: 'master'
-                    //sh "git checkout master"
                     checkout scm
-                
                     def app
                     app = docker.build("$DOCKER_REGISTRY/$APP_NAME")
-                    
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                        //sh "docker build -t $DOCKER_REGISTRY/$APP_NAME ."
-                        //sh "docker push $DOCKER_REGISTRY/$APP_NAME"
                         app.push("latest")
                     }
                 }
-                
-                //def app
-                //app = docker.build("robjahn/jmeter")
-                //docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                //    app.push("${env.BUILD_NUMBER}")
-                //    app.push("latest")
-                //}
-
-                //container('go') {
-                //    sh "docker build -t $DOCKER_REGISTRY/$ORG/$APP_NAME ."
-                //    sh "docker push $DOCKER_REGISTRY/$ORG/$APP_NAME"
-                //}
             }
         }
 
@@ -70,43 +48,40 @@ pipeline {
             }
             steps
             {
-                //container('go') {
-                    // lets create the results directory                    
-                    sh "rm -f -r $RESULTDIR"
-                    sh "mkdir $RESULTDIR"
+		// lets create the results directory                    
+		sh "rm -f -r $RESULTDIR"
+		sh "mkdir $RESULTDIR"
 
-                    // lets run the test and put the console output to output.txt
-                    sh "echo 'launching container and put result in output.txt'"
-                
-                    try {
-                        sh "docker run -v /var/lib/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm $DOCKER_REGISTRY/$APP_NAME ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l results/result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$ThinkTime' > output.txt"
-                    } finally {
-	                    archiveArtifacts artifacts: 'results/**', fingerprint: true, allowEmptyArchive: true
-	                    archiveArtifacts artifacts: 'output.txt', fingerprint: true, allowEmptyArchive: true
-	                }
+		// lets run the test and put the console output to output.txt
+		sh "echo 'launching container and put result in output.txt'"
+		sh "docker run -v /var/lib/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm $DOCKER_REGISTRY/$APP_NAME ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l results/result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VUCount' -JLoopCount='$LoopCount' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$ThinkTime' > output.txt"
 
-                    // Lets do the functional validation if FUNC_VALIDATION=='yes'
-                    sh '''
-                        ERROR_COUNT=$(awk '/summary =/ {print $15;}' output.txt)
-                        if [ "$FUNC_VALIDATION" = "yes" ] && [ $ERROR_COUNT -gt 0 ]
-                        then
-                            echo "More than 1 error"
-                        exit 1
-                        fi
-                    '''
+		// Lets do the functional validation if FUNC_VALIDATION=='yes'
+		sh '''
+		    ERROR_COUNT=$(awk '/summary =/ {print $15;}' output.txt)
+		    if [ "$FUNC_VALIDATION" = "yes" ] && [ $ERROR_COUNT -gt 0 ]
+		    then
+		        echo "More than 1 error"
+			exit 1
+		    fi
+		 '''
 
-                    // Lets do the performance validation if AVG_RT_VALIDATION > 0
-                    sh '''
-                        AVG_RT=$(awk '/summary =/ {print $9;}' output.txt)
-                        echo "AVG_RT = $AVG_RT"
-                        if [ $AVG_RT_VALIDATION -gt 0 ] && [ $AVG_RT_VALIDATION -gt $AVG_RT ]
-                        then
-                            echo "Response Time Threshold Violation: $AVG_RT > $$AVG_RT_VALIDATION"
-                            exit 1
-                        fi
-                    '''
-                //}
+		 // Lets do the performance validation if AVG_RT_VALIDATION > 0
+		 sh '''
+		     AVG_RT=$(awk '/summary =/ {print $9;}' output.txt)
+		     echo "AVG_RT = $AVG_RT"
+		     if [ $AVG_RT_VALIDATION -gt 0 ] && [ $AVG_RT_VALIDATION -gt $AVG_RT ]
+		     then
+			 echo "Response Time Threshold Violation: $AVG_RT > $$AVG_RT_VALIDATION"
+			 exit 1
+		     fi
+		 '''
             }
-        }
+	    post {
+                always {
+		    archiveArtifacts artifacts: 'results/**', fingerprint: true, allowEmptyArchive: true
+	            archiveArtifacts artifacts: 'output.txt', fingerprint: true, allowEmptyArchive: true
+		}
+            }
     }
 }
