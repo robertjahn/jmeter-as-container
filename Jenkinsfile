@@ -65,7 +65,7 @@ pipeline {
                     {
             
                         echo "launching container and put result in output.txt"
-                        sh "echo Running with VUCount=$VU_COUNT and LoopCount=$LOOP_COUNT" 
+                        sh "echo Running with VU_COUNT=$VU_COUNT and LOOP_COUNT=$LOOP_COUNT" 
 
                         sh "docker run -v /var/lib/jenkins/workspace/$ORG/$APP_NAME/$RESULTDIR:/results --rm $DOCKER_REGISTRY/$APP_NAME ./jmeter/bin/jmeter.sh -n -t /scripts/$SCRIPT_NAME -e -l results/result.tlf -JSERVER_URL='$SERVER_URL' -JDT_LTN='$DT_LTN' -JVUCount='$VU_COUNT' -JLoopCount='$LOOP_COUNT' -JCHECK_PATH='$CHECK_PATH' -JSERVER_PORT='$SERVER_PORT' -JThinkTime='$THINK_TIME' > output.txt"
             
